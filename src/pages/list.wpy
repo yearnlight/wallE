@@ -1,0 +1,78 @@
+<template>
+    <view class="list">
+        <repeat wx:if="{{classes && classes.length}}" for="{{classes}}">
+            <view class="weui-cells weui-cells_after-title">
+                <view class="weui-cell">
+                    <view class="weui-cell__hd">
+                        <image style="background:{{imgs[item.sort_id].color}}" class="sort-icon" src="{{imgs[item.sort_id].src}}" mode="scaleToFill">
+                    </view>
+                    <view class="weui-cell__bd">{{item.name}}</view>
+                    <view class="weui-cell__ft">{{item.type_name}}</view>
+                </view>
+            </view>
+        </repeat>
+        <view class="list-nodata" wx:if="{{!(classes && classes.length)}}">此垃圾系统无法找到分类归属</view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class List extends wepy.page {
+  data = {
+    classes: [],
+    imgs:{
+       "1":{src:"../assets/RecycleableWaste.png",color:"#4050fb"},
+       "2":{src:"../assets/HazardouAwaste.png",color:"#F9416E"},
+       "3":{src:"../assets/HouseholdfoodWaste.png",color:"#6E403B"},
+       "4":{src:"../assets/ResidualWaste.png",color:"#32363E"}
+    }
+  };
+
+  config = {
+    navigationBarTitleText: '分类说明'
+  };
+
+  onLoad(options) {
+    let _self = this;
+    let keyword = options.keyword;
+    _self.config.navigationBarTitleText = `${keyword}-${_self.config.navigationBarTitleText}`;
+    wepy.request({
+      url: 'http://localhost:3003/garbage/list',
+      method: 'POST',
+      data: { keyword: keyword },
+      header: { 'Content-Type': 'application/json' },
+      success(res) {
+        if (res.data.status == 200) {
+          _self.classes = res.data.data;
+          _self.$apply();
+        }
+      }
+    });
+  }
+}
+</script>
+
+<style lang="less">
+.list {
+  &-nodata {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+  }
+  .weui-cells{
+      position:inherit;
+      .weui-cell__hd{
+        height:26px;
+        width:26px;
+        margin-right:10px;
+        .sort-icon{
+            height:100%;
+            width:100%;  
+        }
+      }
+
+  }
+}
+</style>
+
+

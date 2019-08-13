@@ -1,0 +1,43 @@
+<template>
+    <view class="desc">{{describe}}</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Desc extends wepy.page {
+  data = {
+    describe: ''
+  };
+
+  config = {
+    navigationBarTitleText: '说明'
+  };
+
+  onLoad(options) {
+    let _self = this;
+    let name = options.name;
+    wepy.request({
+      url: 'http://localhost:3003/garbage/desc',
+      method: 'POST',
+      data: { name: name },
+      header: { 'Content-Type': 'application/json' },
+      success(res) {
+        if (res.data.status == 200) {
+          _self.describe = res.data.data.desc;
+          _self.$apply();
+        }
+      }
+    });
+  }
+}
+</script>
+
+<style lang="less">
+.desc {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+</style>
+
+

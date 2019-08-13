@@ -1,0 +1,95 @@
+<style lang="less">
+.container{
+    height:100vh;
+    background: #ffffff;
+    .userinfo {
+    margin-top:20vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    &-avatar {
+      width: 120rpx;
+      height: 120rpx;
+      border-radius: 50%;
+    }
+    &-nickname {
+      color: #aaa;
+    }
+  }
+}
+</style>
+<template>
+  <view class="container">
+    <view class="userinfo" @tap="headerToWallE">
+      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+      <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
+    </view>
+    <toast />
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import moduleA from 'module-a' // aliasFields ignore module example
+  import Toast from 'wepy-com-toast'
+  import testMixin from '../mixins/test'
+
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '机器人瓦力'
+    }
+    components = {
+      toast: Toast
+    }
+
+    mixins = [testMixin]
+
+    data = {
+      mynum: 20,
+      userInfo: {
+        nickName: '加载中...'
+      },
+      normalTitle: '原始标题',
+      setTimeoutTitle: '标题三秒后会被修改',
+      count: 0,
+      netrst: ''
+    }
+
+    computed = {
+      now () {
+        return +new Date()
+      }
+    }
+
+    methods = {
+     headerToWallE(){
+       this.$navigate({url:"home"});
+     }
+    }
+
+    events = {
+      'index-emit': (...args) => {
+        let $event = args[args.length - 1]
+      }
+    }
+
+    onLoad() {
+      let self = this
+      this.$parent.getUserInfo(function (userInfo) {
+        if (userInfo) {
+          self.userInfo = userInfo
+        }
+        self.normalTitle = '标题已被修改'
+
+        self.setTimeoutTitle = '标题三秒后会被修改'
+        setTimeout(() => {
+          self.setTimeoutTitle = '到三秒了'
+          self.$apply()
+        }, 3000)
+
+        self.$apply()
+      })
+    }
+  }
+</script>

@@ -1,0 +1,263 @@
+<template>
+  <view class="home">
+    <view class="home-top">
+      <image src="../assets/wallE-home.jpg" mode="scaleToFill">
+      <view class="home-top-search">
+        <view>
+          <view class="weui-search-bar">
+            <view class="weui-search-bar__form">
+              <view class="weui-search-bar__box">
+                <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
+                <input
+                  type="text"
+                  class="weui-search-bar__input"
+                  placeholder="请输入垃圾名称"
+                  value="{{inputVal}}"
+                  focus="{{inputShowed}}"
+                  bindinput="inputTyping"
+                >
+                <view class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput">
+                  <icon type="clear" size="14"></icon>
+                </view>
+              </view>
+              <label class="weui-search-bar__label" hidden="{{inputShowed}}" bindtap="showInput">
+                <icon class="weui-icon-search" type="search" size="14"></icon>
+                <view class="weui-search-bar__text">搜索</view>
+              </label>
+            </view>
+            <view
+              class="note-btn"
+              bindtouchstart="voiceStartRecord"
+              bindtouchend="voiceEndRecord"
+            >
+              <image src="../assets/voice.png">
+            </view>
+            <view class="note-btn" @tap="searchClass" style="background:#ffffff;">
+              <image src="../assets/search.png">
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="home-list">
+      <repeat for="{{classes}}">
+        <view class="home-list-item" @tap="goToDesc({{item.name}})">
+          <image src="{{item.img}}" mode="scaleToFill">
+          {{item.name}}
+        </view>
+      </repeat>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import Toast from 'wepy-com-toast';
+export default class Home extends wepy.page {
+  components = {
+    toast: Toast
+  };
+
+  config = {
+    navigationBarTitleText: '机器人瓦力'
+  };
+
+  data = {
+    classes: [
+      {
+        name: '可回收物',
+        img: '../assets/RecycleableWaste.png',
+        desc: '',
+        color: ''
+      },
+      {
+        name: '湿垃圾',
+        img: '../assets/HouseholdfoodWaste.png',
+        desc: '',
+        color: ''
+      },
+      {
+        name: '有害垃圾',
+        img: '../assets/HazardouAwaste.png',
+        desc: '',
+        color: ''
+      },
+      {
+        name: '干垃圾',
+        img: '../assets/ResidualWaste.png',
+        desc: '',
+        color: ''
+      }
+    ],
+    inputVal: '',
+    inputShowed: false,
+    fun: ''
+  };
+
+  getGarbage(self) {
+    if (self.inputVal) {
+      self.$navigate({ url: `list?keyword=${self.inputVal}` });
+    }
+  }
+
+  debounce(fn, wait, self) {
+    if (this.fun !== null) {
+      clearTimeout(this.fun);
+    }
+    this.fun = setTimeout(() => {
+      fn(self);
+    }, wait);
+  }
+
+  methods = {
+    voiceStartRecord() {
+      this.recorderManager.start({
+        // 最大长度设置为 2 分钟
+        duration: 2 * 60 * 1000,
+        // 格式
+        format: 'mp3',
+        sampleRate: 16000,
+        encodeBitRate: 25600,
+        frameSize: 9,
+        numberOfChannels: 1
+      });
+    },
+    voiceEndRecord() {
+      this.recorderManager.stop();
+    },
+    showInput() {
+      this.inputShowed = true;
+    },
+    hideInput() {
+      this.inputVal = '';
+      this.inputShowed = false;
+    },
+    clearInput(self) {
+      let _this = self || this;
+      _this.inputVal = '';
+    },
+    inputTyping(e) {
+      this.inputVal = e.detail.value;
+    },
+    goToDesc(name) {
+      this.$navigate({ url: `desc?name=${name}` });
+    },
+    searchClass() {
+      var self = this;
+      this.getGarbage(self);
+    }
+  };
+
+  onLoad() {
+    var self = this;
+    self.recorderManager = wx.getRecorderManager();
+    self.recorderManager.onError(function() {
+      console.log('录音失败！');
+    });
+    self.recorderManager.onStop(function(res) {
+      self.setData({
+        src: res.tempFilePath
+      });
+      wx.uploadFile({
+        url: 'http://localhost:3003/recognition',
+        filePath: res.tempFilePath,
+        name: 'file',
+        formData: {
+          'msg': 'voice'
+        }, // HTTP 请求中其他额外的 form data
+        success(res) {
+          console.log(res);
+        }
+      });
+      console.log('录音完成！');
+    });
+  }
+
+  onShow() {
+    this.methods.clearInput(this);
+  }
+}
+</script>
+<style lang="less">
+.home {
+  height: 100%;
+  flex-direction: column;
+  display: flex;
+  &-top {
+    .weui-search-bar {
+      background-color: #ffffff;
+      border-top: none;
+      border-bottom: none;
+      border-radius: 5px;
+    }
+    width: 100%;
+    position: relative;
+    image {
+      width: inherit;
+    }
+    &-search {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      padding: 0;
+      transform: translate(-50%, 0%);
+      border: none;
+      width: calc(100% - 20px);
+      .weui-btn {
+        margin-top: 0;
+      }
+      .note-btn {
+        width: 32px;
+        height: 32px;
+        background: #20db8a;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0, 49, 114, 0.2);
+        transition: all 300ms ease;
+        z-index: 1000;
+        margin: 0 5px;
+        image {
+          height: 16px;
+          width: 16px;
+        }
+      }
+    }
+  }
+  &-list {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    &-item {
+      width: calc(50% - 20px);
+      margin: 10px;
+      border-radius: 10px;
+      height: 120px;
+      display: inherit; //继承
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 16px;
+      flex-direction: column;
+      image {
+        width: 60px;
+        height: 60px;
+      }
+      &:nth-child(1) {
+        background: linear-gradient(to bottom right, #30b0e7, #4050fb);
+      }
+      &:nth-child(2) {
+        background: linear-gradient(to bottom right, #9e695d, #6e403b);
+      }
+      &:nth-child(3) {
+        background: linear-gradient(to bottom right, #fa84ac, #f9416e);
+      }
+      &:nth-child(4) {
+        background: linear-gradient(to bottom right, #525e60, #32363e);
+      }
+    }
+  }
+}
+</style>
+
