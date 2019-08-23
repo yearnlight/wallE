@@ -1,0 +1,34 @@
+<template>
+    <view class="cu-timeline">
+        <view class="cu-item text-green cuIcon-time">
+            <repeat for="{{logs}}">
+                <view class="bg-gradual-green content shadow">
+                    <view class="cu-capsule radius">
+                        <view class="cu-tag bg-white text-green">{{item.version}}</view>
+                        <view class="cu-tag line-white">{{item.date}}</view>
+                    </view>
+                    <view class="margin-top-sm text-content">
+                        <repeat for="{{item.content}}" item="citem">
+                            <view>{{citem}}</view>
+                        </repeat>
+                    </view>
+                </view>
+            </repeat>
+
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Log extends wepy.page {
+  data = {
+    logs: [{
+      date: '2019年08月16日',
+      version: 'v1.0.0',
+      content: ['1.垃圾分类搜索', '2.垃圾分类知识竞赛', '3.关于']
+    }]
+  };
+}
+</script>
+

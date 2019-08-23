@@ -1,38 +1,7 @@
 <style lang="less">
-@import './style/weui.less';
-page{
-    background-color: #F8F8F8;
-    font-size: 16px;
-    font-family: -apple-system-font,Helvetica Neue,Helvetica,sans-serif;
-}
-.page__hd {
-    padding: 40px;
-}
-.page__bd {
-    padding-bottom: 40px;
-}
-.page__bd_spacing {
-    padding-left: 15px;
-    padding-right: 15px;
-}
+@import './components/colorui.wxss';
+@import './components/icon.wxss';
 
-.page__ft{
-    padding-bottom: 10px;
-    text-align: center;
-}
-
-.page__title {
-    text-align: left;
-    font-size: 20px;
-    font-weight: 400;
-}
-
-.page__desc {
-    margin-top: 5px;
-    color: #888888;
-    text-align: left;
-    font-size: 14px;
-}
 .container {
   height: 100%;
   display: flex;
@@ -41,25 +10,62 @@ page{
   justify-content: space-between;
   box-sizing: border-box;
 }
+
+Page {
+  background: #fff;
+}
 </style>
 
 <script>
 import wepy from 'wepy';
 import 'wepy-async-function';
+// import regeneratorRuntime from 'utils/runtime.js'
 
 export default class extends wepy.app {
   config = {
     pages: [
-      'pages/index',
+      'pages/login', //登录
       'pages/home', //首页
+      'pages/competition', //竞赛
+      'pages/about', //关于
       'pages/desc', //详情
-      'pages/list' //列表
+      'pages/list', //列表
+      'pages/log', //日志
+      'pages/problems', //常见问题
+      'pages/focus' //常见问题
     ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: 'WeChat',
+      navigationBarTitleText: '机器人瓦力',
+      enablePullDownRefresh: false,
       navigationBarTextStyle: 'black'
+    },
+    tabBar: {
+      color: '#999999',
+      selectedColor: '#8dc63f',
+      backgroundColor: '#ffffff',
+      borderStyle: 'white',
+      list: [
+        {
+          pagePath: 'pages/home',
+          text: '首页',
+          iconPath: 'assets/home.png',
+          selectedIconPath: 'assets/home_cur.png'
+        },
+        {
+          pagePath: 'pages/competition',
+          text: '竞赛',
+          iconPath: 'assets/competition.png',
+          selectedIconPath: 'assets/competition_cur.png'
+        },
+        {
+          pagePath: 'pages/about',
+          text: '关于',
+          iconPath: 'assets/about.png',
+          selectedIconPath: 'assets/about_cur.png'
+        }
+      ]
     }
   };
 

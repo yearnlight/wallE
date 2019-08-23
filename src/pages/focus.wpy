@@ -1,0 +1,27 @@
+<template>
+    <view class='margin-xl bg-white padding-xl radius shadow-lg'>
+        <view class='text-center margin-bottom text-lg  text-grey'>关注</view>
+        <view class='text-content focus'>
+            <view>Hi！欢迎关注旋涡数据公众号</view>
+            <view class='margin-top-sm'>
+                <image class="focus-qcode" src="../assets/qcode.jpeg" mode="scaleToFill"></image>
+            </view>
+        </view>
+    </view>
+</template>
+<script>
+import wepy from 'wepy';
+export default class Focus extends wepy.page {
+
+}
+</script>
+<style lang="less">
+.focus{
+    text-align: center;
+    &-qcode{
+        width: 250px;
+        height: 250px;
+    }
+}
+</style>
+

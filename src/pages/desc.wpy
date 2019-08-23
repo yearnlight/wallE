@@ -1,12 +1,25 @@
 <template>
-    <view class="desc">{{describe}}</view>
+  <view class="desc">
+    <image class="desc-poster" src="{{posters[name]}}" mode="scaleToFill"></image>
+    <view class="desc-info text-gray">{{describe}}</view>
+  </view>
+
 </template>
 
 <script>
 import wepy from 'wepy';
 export default class Desc extends wepy.page {
+  components = {};
+
   data = {
-    describe: ''
+    describe: '',
+    name: '',
+    posters: {
+      可回收物: '../assets/poster.jpg',
+      厨余垃圾: '../assets/poster.jpg',
+      有害垃圾: '../assets/poster.jpg',
+      其他垃圾: '../assets/poster.jpg'
+    }
   };
 
   config = {
@@ -16,8 +29,9 @@ export default class Desc extends wepy.page {
   onLoad(options) {
     let _self = this;
     let name = options.name;
+    _self.name = name;
     wepy.request({
-      url: 'http://localhost:3003/garbage/desc',
+      url: 'http://localhost:3004/garbage/desc',
       method: 'POST',
       data: { name: name },
       header: { 'Content-Type': 'application/json' },
@@ -34,9 +48,15 @@ export default class Desc extends wepy.page {
 
 <style lang="less">
 .desc {
-  padding: 10px;
-  display: flex;
-  justify-content: center;
+  &-info {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+  }
+  &-poster {
+    width:100%;
+    height: 200px;
+  }
 }
 </style>
 

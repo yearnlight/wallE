@@ -1,0 +1,22 @@
+<template>
+    <view class='margin-xl bg-white padding-xl radius shadow-lg'>
+        <view class='text-center margin-bottom text-lg  text-grey'>关于</view>
+        <view class='text-content'>
+            <view>Hi！欢迎使用机器人瓦力！</view>
+            <view class='margin-top-sm'>该服务会持续优化维护。</view>
+            <view class='margin-top-sm'>该服务有任何问题或者待优化的点欢迎在意见反馈中提出，我们将竭力完善。</view>
+            <view class='margin-top-sm'>该服务致力于垃圾分类习惯培养，可回收资源再利用。</view>
+            <view class='margin-top-sm'>更多功能敬请期待！</view>
+        </view>
+    </view>
+</template>
+<script>
+import wepy from 'wepy';
+export default class Problem extends wepy.page {}
+</script>
+
+<style lang="less">
+Page{
+    background: none;
+}
+</style>

@@ -2,48 +2,28 @@
   <view class="home">
     <view class="home-top">
       <image src="../assets/wallE-home.jpg" mode="scaleToFill">
-      <view class="home-top-search">
-        <view>
-          <view class="weui-search-bar">
-            <view class="weui-search-bar__form">
-              <view class="weui-search-bar__box">
-                <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
-                <input
-                  type="text"
-                  class="weui-search-bar__input"
-                  placeholder="请输入垃圾名称"
-                  value="{{inputVal}}"
-                  focus="{{inputShowed}}"
-                  bindinput="inputTyping"
-                >
-                <view class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput">
-                  <icon type="clear" size="14"></icon>
-                </view>
+        <view class="home-top-search">
+          <view>
+            <view class="cu-bar bg-white search">
+              <view class="search-form round">
+                <text class="cuIcon-search"></text>
+                <input type="text" placeholder="请输入垃圾名称" value="{{inputVal}}" focus="{{inputShowed}}" bindinput="inputTyping" confirm-type="search"></input>
               </view>
-              <label class="weui-search-bar__label" hidden="{{inputShowed}}" bindtap="showInput">
-                <icon class="weui-icon-search" type="search" size="14"></icon>
-                <view class="weui-search-bar__text">搜索</view>
-              </label>
-            </view>
-            <view
-              class="note-btn"
-              bindtouchstart="voiceStartRecord"
-              bindtouchend="voiceEndRecord"
-            >
-              <image src="../assets/voice.png">
-            </view>
-            <view class="note-btn" @tap="searchClass" style="background:#ffffff;">
-              <image src="../assets/search.png">
+              <!-- <view class="note-btn" bindtouchstart="voiceStartRecord" bindtouchend="voiceEndRecord">
+                <image src="../assets/voice.png">
+              </view> -->
+              <view class="action">
+                <button @tap="searchClass" class="cu-btn bg-gradual-green shadow-blur round">搜索</button>
+              </view>
             </view>
           </view>
         </view>
-      </view>
     </view>
     <view class="home-list">
       <repeat for="{{classes}}">
         <view class="home-list-item" @tap="goToDesc({{item.name}})">
           <image src="{{item.img}}" mode="scaleToFill">
-          {{item.name}}
+            {{item.name}}
         </view>
       </repeat>
     </view>
@@ -59,7 +39,7 @@ export default class Home extends wepy.page {
   };
 
   config = {
-    navigationBarTitleText: '机器人瓦力'
+    navigationBarTitleText: '首页'
   };
 
   data = {
@@ -71,7 +51,7 @@ export default class Home extends wepy.page {
         color: ''
       },
       {
-        name: '湿垃圾',
+        name: '厨余垃圾',
         img: '../assets/HouseholdfoodWaste.png',
         desc: '',
         color: ''
@@ -83,7 +63,7 @@ export default class Home extends wepy.page {
         color: ''
       },
       {
-        name: '干垃圾',
+        name: '其他垃圾',
         img: '../assets/ResidualWaste.png',
         desc: '',
         color: ''
@@ -159,11 +139,12 @@ export default class Home extends wepy.page {
         src: res.tempFilePath
       });
       wx.uploadFile({
-        url: 'http://localhost:3003/recognition',
+        url: 'http://localhost:3004/recognition',
         filePath: res.tempFilePath,
         name: 'file',
+        header: { 'content-Type': 'multipart/form-data ' },
         formData: {
-          'msg': 'voice'
+          msg: 'voice'
         }, // HTTP 请求中其他额外的 form data
         success(res) {
           console.log(res);
@@ -184,11 +165,16 @@ export default class Home extends wepy.page {
   flex-direction: column;
   display: flex;
   &-top {
+    .cuIcon-search {
+      padding: 0 10px;
+    }
     .weui-search-bar {
       background-color: #ffffff;
       border-top: none;
       border-bottom: none;
       border-radius: 5px;
+      display: flex;
+      align-items: center;
     }
     width: 100%;
     position: relative;
@@ -206,27 +192,10 @@ export default class Home extends wepy.page {
       .weui-btn {
         margin-top: 0;
       }
-      .note-btn {
-        width: 32px;
-        height: 32px;
-        background: #20db8a;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 2px 10px rgba(0, 49, 114, 0.2);
-        transition: all 300ms ease;
-        z-index: 1000;
-        margin: 0 5px;
-        image {
-          height: 16px;
-          width: 16px;
-        }
-      }
     }
   }
   &-list {
-    margin-top: 15px;
+    margin-top: 10px;
     display: flex;
     flex-wrap: wrap;
     &-item {

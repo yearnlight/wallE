@@ -8,7 +8,7 @@ const query = require('./pool'),
     ffmpeg = require('fluent-ffmpeg'),
     AipSpeechServer = require('baidu-aip-sdk').speech;
 
-    ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 const APP_ID = "16815350";
 const API_KEY = "eIbDqc5uNcuy2CTOawvOcDW3";
@@ -24,14 +24,11 @@ router.post('/recognition', function (ctx, next) {
     //上传完成后处理
     form.parse(req, function (err, fields, files) {
         var filesTemp = JSON.stringify(files, null, 2);
-        console.log("测试1")
         if (err) {
-            console.log(err)
-            ctx.body = { status: -1, msg: '', data: '未知错误' };
+            console.log('录音文件上传失败')
+            ctx.response.body = { status: 500, msg: '', data: '录音文件上传失败' };
         } else {
-            console.log("测试3")
             var inputFile = files.file[0];
-            
             var uploadedPath = inputFile.path;
             var command = ffmpeg();
             command.addInput(uploadedPath)
@@ -93,6 +90,14 @@ router.post('/garbage/list', async (ctx) => {
     ctx.response.body = { status: 200, msg: '', data: res };
 })
 
+router.post('/garbage/rand', async (ctx) => {
+    let res = await query(`select * from (select * from product  where id in (select ceiling(2534*rand()+1) union select ceil(2534*rand()-1)) 
+    union all
+    select * from product where id = 2525) a
+    limit 0,1;`);
+    ctx.response.body = { status: 200, msg: '', data: res };
+})
+
 router.post('/garbage/desc', async (ctx) => {
     let params = ctx.request.body;
     let res = [];
@@ -108,17 +113,17 @@ router.post('/garbage/desc', async (ctx) => {
 
 // app.use(bodyParser());
 app.use(koaBody({
-  multipart: true, // 支持文件上传
-  formidable: {
-    maxFieldsSize: 2 * 1024 * 1024, // 最大文件为2兆
-    multipart: true // 是否支持 multipart-formdate 的表单
-  }
+    multipart: true, // 支持文件上传
+    formidable: {
+        maxFieldsSize: 2 * 1024 * 1024, // 最大文件为2兆
+        multipart: true // 是否支持 multipart-formdate 的表单
+    }
 }));
 
 app.use(router.routes());
 
 app.use(router.allowedMethods());
 
-app.listen(3003, () => {
-    console.log('\033[42;37m SUCCESS \033[42;37m 服务端启动成功,localhost:3003\033[0m')
+app.listen(3004, () => {
+    console.log('\033[42;37m SUCCESS \033[42;37m 服务端启动成功,localhost:3004\033[0m')
 });

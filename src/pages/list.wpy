@@ -1,30 +1,44 @@
 <template>
     <view class="list">
-        <repeat wx:if="{{classes && classes.length}}" for="{{classes}}">
-            <view class="weui-cells weui-cells_after-title">
-                <view class="weui-cell">
-                    <view class="weui-cell__hd">
-                        <image style="background:{{imgs[item.sort_id].color}}" class="sort-icon" src="{{imgs[item.sort_id].src}}" mode="scaleToFill">
-                    </view>
-                    <view class="weui-cell__bd">{{item.name}}</view>
-                    <view class="weui-cell__ft">{{item.type_name}}</view>
-                </view>
+      <repeat wx:if="{{classes && classes.length}}" for="{{classes}}">
+        <view class="cu-list menu sm-border">
+          <view class="cu-item">
+            <view class="cu-avatar radius sm {{labels[item.type_name]}}" style="margin-right:20rpx;background-image:url({{imgs[item.sort_id].src}});"></view>
+            <view class="content">
+              <view class="text-grey">{{item.name}}</view>
+              <view class="text-gray text-sm flex">
+                <text class="text-cut">
+
+                </text>
+              </view>
             </view>
-        </repeat>
-        <view class="list-nodata" wx:if="{{!(classes && classes.length)}}">此垃圾系统无法找到分类归属</view>
+            <view class="action">
+              <view class="cu-tag round light {{labels[item.type_name]}}">{{item.type_name}}</view>
+            </view>
+          </view>
+        </view>
+      </repeat>
+      <view class="list-nodata" wx:if="{{!(classes && classes.length)}}">此垃圾系统无法找到分类归属</view>
     </view>
 </template>
 
 <script>
 import wepy from 'wepy';
 export default class List extends wepy.page {
+  
   data = {
     classes: [],
-    imgs:{
-       "1":{src:"../assets/RecycleableWaste.png",color:"#4050fb"},
-       "2":{src:"../assets/HazardouAwaste.png",color:"#F9416E"},
-       "3":{src:"../assets/HouseholdfoodWaste.png",color:"#6E403B"},
-       "4":{src:"../assets/ResidualWaste.png",color:"#32363E"}
+    labels: {
+      可回收物: 'bg-olive',
+      厨余垃圾: 'bg-orange',
+      其他垃圾: 'bg-blue',
+      有害垃圾: 'bg-red'
+    },
+    imgs: {
+      '1': { src: '../assets/RecycleableWaste.png', color: '#4050fb' },
+      '2': { src: '../assets/HazardouAwaste.png', color: '#F9416E' },
+      '3': { src: '../assets/HouseholdfoodWaste.png', color: '#6E403B' },
+      '4': { src: '../assets/ResidualWaste.png', color: '#32363E' }
     }
   };
 
@@ -35,9 +49,11 @@ export default class List extends wepy.page {
   onLoad(options) {
     let _self = this;
     let keyword = options.keyword;
-    _self.config.navigationBarTitleText = `${keyword}-${_self.config.navigationBarTitleText}`;
+    _self.config.navigationBarTitleText = `${keyword}-${
+      _self.config.navigationBarTitleText
+    }`;
     wepy.request({
-      url: 'http://localhost:3003/garbage/list',
+      url: 'http://localhost:3004/garbage/list',
       method: 'POST',
       data: { keyword: keyword },
       header: { 'Content-Type': 'application/json' },
@@ -59,18 +75,17 @@ export default class List extends wepy.page {
     display: flex;
     justify-content: center;
   }
-  .weui-cells{
-      position:inherit;
-      .weui-cell__hd{
-        height:26px;
-        width:26px;
-        margin-right:10px;
-        .sort-icon{
-            height:100%;
-            width:100%;  
-        }
+  .weui-cells {
+    position: inherit;
+    .weui-cell__hd {
+      height: 26px;
+      width: 26px;
+      margin-right: 10px;
+      .sort-icon {
+        height: 100%;
+        width: 100%;
       }
-
+    }
   }
 }
 </style>

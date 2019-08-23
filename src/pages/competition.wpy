@@ -1,0 +1,207 @@
+<template>
+  <view>
+    <view class="cu-bar bg-white solid-bottom margin-top">
+      <view class="action">
+        <text class="cuIcon-title text-orange "></text> 判断当前垃圾属于哪类？总共<text class="testNum text-orange"> 20 / {{statistical.total}} </text>题
+      </view>
+    </view>
+    <view class="cu-list grid col-1 {{gridBorder?'':'no-border'}}">
+      <repeat for="{{garbage}}" item="item">
+        <view class="cu-item garbage-item">
+          <view class="cu-avatar xl radius" style="background-image:url({{garbageImg}});">
+            <view class="cu-tag badge">
+              <block>垃圾</block>
+            </view>
+          </view>
+          <text>{{item.name}}</text>
+        </view>
+      </repeat>
+    </view>
+
+    <view class="padding-sm garbage-types">
+      <view class="flex flex-wrap justify-around">
+        <repeat for="{{types}}">
+          <button disabled="{{isDisabled}}" @tap="judge({{item.sortId}})" style="color:#ffffff;background:{{item.color}};animation-delay: 0.5s;" class=" cu-btn margin-sm basis-sm shadow">{{item.name}}</button>
+        </repeat>
+      </view>
+    </view>
+
+    <view wx:if="{{status != 0}}" class="tips">
+      <view class="cu-list menu sm-border">
+        <view class="cu-item">
+          <view wx:if="{{!isNext}}" class="cu-avatar radius sm {{status == 1?'cuIcon-roundcheck text-green':'cuIcon-roundclose text-red'}}"></view>
+          <view class="content">
+            <view wx:if="{{!isNext}}" class="text-grey">{{status == 1?"你太棒了,答对啦":errorMsg}}<text wx:if="{{status == 1}}" class="cuIcon-appreciate"></text></view>
+            <view class="text-gray text-sm flex">
+              <text class="text-cut">
+
+              </text>
+            </view>
+          </view>
+          <view class="action">
+            <button wx:if="{{status == 2}}" class="cu-btn round light" @tap="next">下一题</button>
+          </view>
+        </view>
+        <view class="cu-item">
+          <!-- <view class="cu-tag round light bg-blue">答题 {{statistical.total}}</view> -->
+          <view class="correct cu-tag round light bg-olive">答对 {{statistical.correct}}</view>
+          <view class="cu-tag round light bg-red">答错 {{statistical.error}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+export default class Competition extends wepy.page {
+  data = {
+    garbageImg: '../assets/garbage.png',
+    garbage: [],
+    status: 0,
+    isDisabled: false,
+    isNext: true,
+    statistical: {
+      total: 0,
+      error: 0,
+      correct: 0
+    },
+    errorMsg: '',
+    sorts: {
+      '1': '可回收物',
+      '3': '厨余垃圾',
+      '2': '有害垃圾',
+      '4': '其他垃圾'
+    },
+    types: [
+      {
+        color: 'linear-gradient(to bottom right, #30b0e7, #4050fb)',
+        name: '可回收物',
+        sortId: 1
+      },
+      {
+        color: 'linear-gradient(to bottom right, #9e695d, #6e403b)',
+        name: '厨余垃圾',
+        sortId: 3
+      },
+      {
+        color: 'linear-gradient(to bottom right, #fa84ac, #f9416e)',
+        name: '有害垃圾',
+        sortId: 2
+      },
+      {
+        color: 'linear-gradient(to bottom right, #525e60, #32363e)',
+        name: '其他垃圾',
+        sortId: 4
+      }
+    ]
+  };
+  components = {};
+
+  config = {
+    navigationBarTitleText: '竞赛'
+  };
+
+  onLoad() {}
+
+  onShow() {
+    this.methods.reset(this);
+  }
+
+  judgeResult(sortId) {
+    let _self = this;
+    _self.statistical.total++;
+    if (_self.garbage[0].sort_id == sortId) {
+      _self.methods.getRandData(_self);
+      _self.status = 1;
+      _self.statistical.correct++;
+    } else {
+      _self.isDisabled = true;
+      _self.status = 2;
+      _self.statistical.error++;
+      _self.errorMsg =
+        _self.garbage[0].name + '属于' + _self.sorts[_self.garbage[0].sort_id];
+    }
+    if(_self.statistical.total >= 20){
+       wx.showToast({title:"训练完成",duration:10000,image:'../assets/winface.png'});
+       _self.methods.reset(_self);
+    }
+  }
+
+  methods = {
+    next() {
+      this.methods.getRandData(this);
+      this.isDisabled = false;
+      this.isNext = true;
+    },
+    getRandData(self) {
+      let _self = self || this;
+      wepy.request({
+        url: 'http://localhost:3004/garbage/rand',
+        method: 'POST',
+        data: {},
+        header: { 'Content-Type': 'application/json' },
+        success(res) {
+          if (res.data.status == 200) {
+            _self.garbage = res.data.data;
+            _self.$apply();
+          }
+        }
+      });
+    },
+    judge(sortId) {
+      this.isNext = false;
+      this.judgeResult(sortId);
+    },
+    reset(self) {
+      let _self = self || this;
+      _self.methods.getRandData(_self);
+      _self.statistical = {
+        total: 0,
+        error: 0,
+        correct: 0
+      };
+      _self.errorMsg = '';
+      _self.status = 0;
+      _self.isDisabled = false;
+    }
+  };
+}
+</script>
+
+<style lang="less">
+.testNum{
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.garbage-item {
+  align-items: center;
+  .cu-avatar {
+    background-color: #ffffff;
+  }
+}
+
+.garbage-types {
+  .cu-btn {
+    height: 100rpx;
+  }
+}
+
+.tips {
+  .cu-avatar {
+    background-color: #ffffff;
+  }
+
+  .cuIcon-appreciate{
+    margin-left:5px;
+  }
+
+  .correct{
+    margin-left: auto;
+    margin-right: 10px;
+  }
+}
+</style>
+
+
